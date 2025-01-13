@@ -5,6 +5,7 @@ import mk.ukim.finki.wp.kol2024g1.model.RoomType;
 import mk.ukim.finki.wp.kol2024g1.service.HotelService;
 import mk.ukim.finki.wp.kol2024g1.service.ReservationService;
 import org.springframework.data.domain.Page;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -49,7 +50,8 @@ public class ReservationsController {
                           Model model
                           ) {
 
-        Page<Reservation> page = this.reservationService.findPage(guestName, roomType, hotel, pageNum, pageSize);
+        Page<Reservation> page = this.reservationService.findPage(guestName, roomType, hotel
+                , pageNum -1, pageSize);
 
         model.addAttribute("page", page);
 
@@ -70,6 +72,7 @@ public class ReservationsController {
      * @return The view "form.html".
      */
     @GetMapping("/add")
+    @PreAuthorize("hasRole('ADMIN')")
     public String showAdd(Model model) {
 
         model.addAttribute("roomTypes", Arrays.stream(RoomType.values()).toList());
@@ -86,9 +89,10 @@ public class ReservationsController {
      * @return The view "form.html".
      */
     @GetMapping("/edit/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public String showEdit(@PathVariable Long id, Model model) {
 
-        model.addAttribute("reservations", this.reservationService.findById(id));
+        model.addAttribute("reservation", this.reservationService.findById(id));
         model.addAttribute("roomTypes", Arrays.stream(RoomType.values()).toList());
         model.addAttribute("hotels", this.hotelService.listAll());
 
@@ -103,6 +107,7 @@ public class ReservationsController {
      * @return The view "list.html".
      */
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public String create(@RequestParam String guestName,
                          @RequestParam LocalDate dateCreated,
                          @RequestParam Integer daysOfStay,
@@ -122,6 +127,7 @@ public class ReservationsController {
      * @return The view "list.html".
      */
     @PostMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public String update(@PathVariable Long id,
                          @RequestParam String guestName,
                          @RequestParam LocalDate dateCreated,
@@ -142,6 +148,7 @@ public class ReservationsController {
      * @return The view "list.html".
      */
     @PostMapping("/delete/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public String delete(@PathVariable Long id) {
 
         this.reservationService.delete(id);
@@ -158,6 +165,7 @@ public class ReservationsController {
      * @return The view "list.html".
      */
     @PostMapping("/extend/{id}")
+    @PreAuthorize("hasRole('USER')")
     public String extend(@PathVariable Long id) {
 
         this.reservationService.extendStay(id);

@@ -80,7 +80,7 @@ public class ReservationServiceImpl implements ReservationService {
         Reservation reservation = this.findById(id);
         reservation.setDaysOfStay(reservation.getDaysOfStay() + 1);
 
-        return reservation;
+        return reservationRepository.save(reservation);
     }
 
     @Override
